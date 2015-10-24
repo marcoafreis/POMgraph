@@ -1,11 +1,13 @@
 import com.marcoafreis.java.utils.pomgraph.PomgraphTokens;
 import com.marcoafreis.java.utils.pomgraph.exceptions.PomgraphXmlReaderException;
 import com.marcoafreis.java.utils.pomgraph.utils.FilterDirectoryFiles;
-import com.marcoafreis.java.utils.pomgraph.xml.ds.Model;
 import com.marcoafreis.java.utils.pomgraph.xml.rd.PomReader;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 
@@ -14,16 +16,18 @@ import java.util.Set;
  */
 public class XmlReadTest {
 
-//    @Test
+    @Test
     public void pomToJavaClass() throws PomgraphXmlReaderException {
         PomReader reader = new PomReader();
         Model model = reader.read("pom.xml");
 
-        int size = model.getDependencies().getDependency().size();
-        System.out.print(size);
+        List<Dependency> dependencies = model.getDependencies();
+        for(Dependency d : dependencies){
+            System.out.println(d.getArtifactId());
+        }
     }
 
-    @Test
+    //@Test
     public void filterPomFiles() throws IOException {
         Set<String> pomFilesPath = FilterDirectoryFiles.filterByString("", PomgraphTokens.POM_FILE);
 

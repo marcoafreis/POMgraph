@@ -2,13 +2,13 @@ package com.marcoafreis.java.utils.pomgraph.xml.rd;
 
 import com.marcoafreis.java.utils.pomgraph.PomgraphTokens;
 import com.marcoafreis.java.utils.pomgraph.exceptions.PomgraphXmlReaderException;
-import com.marcoafreis.java.utils.pomgraph.xml.ds.Model;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +29,7 @@ public class PomReader implements PomXmlReader {
 
     public PomReader (String filePath){
         this();
-        this.filesPath = new HashSet<String>();
+        this.filesPath = new HashSet<>();
         this.filesPath.add(filePath);
     }
 
@@ -37,7 +37,7 @@ public class PomReader implements PomXmlReader {
         if(filesPath==null || filesPath.size()==0)
             throw  new PomgraphXmlReaderException(PomgraphTokens.NO_FILES_ERROR);
 
-        Set<Model> poms = new HashSet<Model>();
+        Set<Model> poms = new HashSet<>();
         for (String filePath : filesPath)
             poms.add(read(filePath));
 
@@ -46,13 +46,9 @@ public class PomReader implements PomXmlReader {
 
     public Model read(String pomXmlFilePath) throws PomgraphXmlReaderException {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Model.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
-            JAXBElement model = (JAXBElement) jaxbUnmarshaller.unmarshal(new File(pomXmlFilePath));
-
-            return (Model) model.getValue();
-        } catch (JAXBException e) {
+            MavenXpp3Reader reader = new MavenXpp3Reader();
+            return reader.read(new BufferedReader(new FileReader(pomXmlFilePath)));
+        } catch (IOException | XmlPullParserException e) {
             throw new PomgraphXmlReaderException(e);
         }
     }
